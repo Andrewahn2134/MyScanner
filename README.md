@@ -75,6 +75,14 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 - 임시 비밀번호로 로그인 시 **강제 비밀번호 변경 페이지(/change_password)** 로만 접근 가능
 - Reset MFA / Force Logout / Delete user: Users(admin) 메뉴에서 관리
 
+### 관리자 계정 만들기
+```
+1. operator role 로 웹 회원가입
+2. DB에 직접 role 변경
+  docker compose exec db psql -U myscanner -d myscanner -c "UPDATE users SET role = 'admin' WHERE user_id = '<id>';"
+```
+
+
 #### admin 화면
 <img width="1418" height="713" alt="image" src="https://github.com/user-attachments/assets/23055a48-98ec-4304-9d2b-02ecc90df15c" />
 
