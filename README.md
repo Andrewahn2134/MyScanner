@@ -54,6 +54,8 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 ### Audit(관리자 접근가능)
 - 주요 작업(스캔/반영/계정관리/상태변경 등) 감사 로그
 - 날짜 필터는 **KST(Asia/Seoul) 기준**으로 동작하도록 UTC 저장 시간을 변환해 조회
+<img width="1157" height="798" alt="image" src="https://github.com/user-attachments/assets/4a593401-9aea-433c-bd8e-a9b1f3399503" />
+
 
 ### 계정/보안
 - 역할(Role): `admin`, `operator`
