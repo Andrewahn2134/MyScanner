@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Login</h2>
+  {% if error %}<p class="danger">{{ error }}</p>{% endif %}
+  {% if msg %}<p class="ok">{{ msg }}</p>{% endif %}
+  <form method="post" action="/login">
+    <div>
+      <label>UserId</label>
+      <input name="user_id" required>
+    </div>
+    <div style="margin-top:10px">
+      <label>Password</label>
+      <input type="password" name="password" required>
+    </div>
+    <div style="margin-top:12px">
+      <label>MFA Code (6 digits)</label>
+      <input name="mfa_code" placeholder="MFA 설정된 계정만 입력(최초 로그인시 생략략)">
+    </div>
+    <div style="margin-top:12px"><button type="submit">Login</button></div>
+  </form>
+  <p class="muted" style="margin-top:10px">No account? <a href="/signup">Sign up</a></p>
+</div>
+{% endblock %}

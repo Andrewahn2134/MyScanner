@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: myscanner
+      POSTGRES_USER: myscanner
+      POSTGRES_PASSWORD: myscanner
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myscanner -d myscanner"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg2://myscanner:myscanner@db:5432/myscanner
+      SESSION_SECRET: "change-me-in-prod"
+      LOG_DIR: "/var/MyScanner/log"
+      ALLOWED_TARGETS: "192.168.0.0/16,10.0.0.0/8"
+      DEFAULT_NMAP_ARGS: "-sT -sV -Pn -T3 -vv"
+      TZ: "Asia/Seoul"
+    volumes:
+      - /var/MyScanner/log:/var/MyScanner/log
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:

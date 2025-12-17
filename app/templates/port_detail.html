@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Port Detail</h2>
+  <p><span class="pill">IP</span> {{ inv.ip }} <span class="pill">Port</span> {{ inv.port }} <span class="pill">FW</span> {{ inv.firewall_blocked }}</p>
+  <p><span class="pill">State</span> {{ inv.state_latest }} <span class="pill">Service</span> {{ inv.service_latest or "-" }}</p>
+  <p><span class="pill">First</span> {{ to_kst(inv.first_seen_at) }} <span class="pill">Latest</span> {{ to_kst(inv.latest_seen_at) }}</p>
+  <p><span class="pill">Lifecycle</span> {% if inv.inactive %}INACTIVE{% else %}ACTIVE{% endif %} <span class="pill">Misses</span> {{ inv.open_misses }}</p>
+</div>
+<div class="card">
+  <h3>Information</h3>
+  <form method="post" action="/port/{{ inv.id }}">
+    <div class="row">
+      <div><label>Hostname</label><input name="hostname" value="{{ inv.hostname or '' }}" maxlength="20"></div>
+      <div><label>Operator</label><input name="operator" value="{{ inv.operator or '' }}" maxlength="60"></div>
+      <div><label>Owner</label><input name="owner" value="{{ inv.owner or '' }}" maxlength="60"></div>
+    </div>
+    <div style="margin-top:10px">
+      <label>Status {% if user.role == "operator" %}(admin only){% endif %}</label>
+{% if user.role == "operator" %}
+  <input value="{% if inv.inactive %}INACTIVE{% else %}{{ inv.status }}{% endif %}" disabled>
+{% else %}
+  <select name="status" {% if inv.inactive %}disabled{% endif %}>
+    <option value="ACTIVE" {% if inv.status=="ACTIVE" %}selected{% endif %}>ACTIVE</option>
+    <option value="REMEDIATED" {% if inv.status in ["REMEDIATED","ACCEPTED"] %}selected{% endif %}>REMEDIATED</option>
+    <option value="DENIED" {% if inv.status=="DENIED" %}selected{% endif %}>DENIED</option>
+    <option value="IGNORED" {% if inv.status=="IGNORED" %}selected{% endif %}>IGNORED</option>
+  </select>
+{% endif %}
+
+{% if inv.inactive and user.role != "operator" %}
+  <p class="muted" style="margin-top:6px">INACTIVE 상태에서는 Status/Reviewed를 수정할 수 없습니다. (재스캔으로 자동 복귀)</p>
+{% endif %}
+
+    </div>
+    <div style="margin-top:10px">
+      <label>Ticket / Evidence</label>
+      <input name="ticket" value="{{ inv.ticket or "" }}" maxlength="120">
+    </div>
+    <div style="margin-top:10px">
+      <label>Remediation note {% if user.role == "operator" %}(admin only){% endif %}</label>
+{% if user.role == "operator" %}
+  <textarea rows="3" disabled>{{ inv.remediation_note or "" }}</textarea>
+{% else %}
+  <textarea name="remediation_note" rows="3">{{ inv.remediation_note or "" }}</textarea>
+{% endif %}
+
+    </div>
+    <div style="margin-top:10px">
+      <label>Reviewed {% if user.role == "operator" %}(admin only){% endif %}</label>
+{% if user.role == "operator" %}
+  <select disabled>
+    <option value="0" {% if not inv.reviewed %}selected{% endif %}>No</option>
+    <option value="1" {% if inv.reviewed %}selected{% endif %}>Yes</option>
+  </select>
+{% else %}
+  <select name="reviewed" {% if inv.inactive %}disabled{% endif %}>
+    <option value="0" {% if not inv.reviewed %}selected{% endif %}>No</option>
+    <option value="1" {% if inv.reviewed %}selected{% endif %}>Yes</option>
+  </select>
+{% endif %}
+
+    </div>
+    <div style="margin-top:10px"><label>Comment</label>
+      <textarea name="comment">{{ inv.comment or "" }}</textarea>
+</div>
+
+    <div style="margin-top:12px">
+      <input type="hidden" name="back" value="{{ back }}">
+      <button type="submit">Save</button>
+      <a href="{{ back }}" style="margin-left:10px">Back</a>
+    </div>
+  </form>
+</div>
+<div class="card">
+  <h3>Recent events</h3>
+  <table>
+    <thead><tr><th>Date (KST)</th><th>Type</th><th>Prev</th><th>New</th><th>Run</th></tr></thead>
+    <tbody>
+      {% for e in events %}
+        <tr>
+          <td>{{ to_kst(e.event_time) }}</td>
+          <td>{{ e.event_type }}</td>
+          <td class="muted">{{ e.prev_state or '-' }} / {{ e.prev_service or '-' }}</td>
+          <td class="muted">{{ e.new_state or '-' }} / {{ e.new_service or '-' }}</td>
+          <td><a href="/scan/{{ e.scan_run_id }}">scan</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

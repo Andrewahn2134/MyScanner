@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Results</h2>
+  <form method="get" action="/results">
+    <div class="row">
+      <div><label>Start date</label><input type="date" name="start" value="{{ start }}"></div>
+      <div><label>End date</label><input type="date" name="end" value="{{ end }}"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Firewall</label>
+        <select name="fw">
+          <option value="">All</option>
+          <option value="Y" {% if fw=="Y" %}selected{% endif %}>Y</option>
+          <option value="N" {% if fw=="N" %}selected{% endif %}>N</option>
+        </select>
+      </div>
+      </div>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:flex-end;justify-content:flex-end;grid-column:1/-1"><button type="submit">Search</button><a class="btn" href="/export/results?start={{ start }}&end={{ end }}&fw={{ fw }}">Export</a></div>
+    <p class="muted">날짜를 입력하세요</p>
+  </form>
+</div>
+
+{% if rows is not none %}
+<div class="card">
+  <h3>Matched: {{ rows|length }}</h3>
+  <table>
+    <thead><tr><th>Latest Date (KST)</th><th>IP</th><th>Port</th><th>State</th><th>Service</th><th>FW</th><th>Hostname</th><th>Comment</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+        <tr>
+          <td>{{ to_kst(r.latest_seen_at) }}</td>
+          <td>{{ r.ip }}</td>
+          <td>{{ r.port }}</td>
+          <td>{% if r.state_latest=="open" %}<span class="badge b-open">open</span>{% else %}{{ r.state_latest }}{% endif %}</td>
+          <td class="muted">{{ r.service_latest or "-" }}</td>
+          <td>{{ r.firewall_blocked }}</td>
+          <td class="truncate">{{ r.hostname or "-" }}</td>
+          <td class="muted truncate">{% if r.comment %}{{ r.comment }}{% else %}-{% endif %}</td>
+          
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

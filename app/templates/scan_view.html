@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Scan Run</h2>
+  <p><span class="pill">Scan Name</span> {{ run.scan_name or '-' }}</p>
+  <p><span class="pill">XML ID</span> <code>{{ run.xml_id }}</code></p>
+  <p><span class="pill">Status</span> {{ run.status }}</p>
+  <p><span class="pill">Date (KST)</span> {{ to_kst(run.started_at) }} {% if run.finished_at %} ~ {{ to_kst(run.finished_at) }}{% endif %}</p>
+  <p><span class="pill">FW</span> {{ run.firewall_blocked }}</p>
+  <p><span class="pill">Targets</span> <span class="muted">{{ run.target_spec }}</span></p>
+  <p><span class="pill">Ports</span> <span class="muted">{{ run.ports_spec }}</span></p>
+  <p><span class="pill">Executed command</span> <code style="white-space:pre-wrap">{{ run.executed_command or "-" }}</code></p>
+  {% if run.error_message %}<p class="danger">{{ run.error_message }}</p>{% endif %}
+</div>
+<div class="card">
+  <h3>Log tail</h3>
+  <pre style="white-space:pre-wrap;background:#0b1020;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,.08);max-height:260px;overflow:auto">{{ log_tail }}</pre>
+  {% if run.status in ["DONE","STOPPED"] %}
+    <p class="muted">스캔 종료 시, XML을 Inventory에 반영하도록 Ingest 버튼 클릭</p>
+    <p class="muted" style="margin-top:4px">작업완료 후 스캔 결과파일은 제거됩니다.</p>
+    <form method="post" action="/scan/{{ run.id }}/ingest"><button type="submit">Ingest (admin)</button></form>
+  {% endif %}
+</div>
+{% endblock %}

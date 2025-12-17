@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Audit</h2>
+  <p class="muted">Admin-only audit trail (logins, scans, and triage changes).</p>
+
+  <form method="get" action="/audit" style="margin-top:10px">
+    <div class="row">
+      <div><label>Start date</label><input type="date" name="start" value="{{ start }}"></div>
+      <div><label>End date</label><input type="date" name="end" value="{{ end }}"></div>
+      <div><label>User</label><input name="user" value="{{ user_q }}" placeholder="user id contains"></div>
+      <div><label>Action</label><input name="action" value="{{ action_q }}" placeholder="e.g. LOGIN_OK"></div>
+      <div style="display:flex;align-items:flex-end;justify-content:flex-end;gap:10px;grid-column:1/-1">
+        <button type="submit">Search</button>
+        <a class="btn" href="/export/audit?start={{ start }}&end={{ end }}&user={{ user_q }}&action={{ action_q }}">Export</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Logs: {{ rows|length }}</h3>
+  <table style="table-layout:fixed;width:100%">
+    <thead>
+      <tr>
+        <th style="width:18%" class="nowrap">At (KST)</th>
+        <th style="width:12%">User</th>
+        <th style="width:14%">Action</th>
+        <th style="width:22%">Object</th>
+        <th style="width:12%">Src IP</th>
+        <th style="width:22%">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if rows|length == 0 %}
+        <tr><td colspan="6" class="muted">No logs</td></tr>
+      {% else %}
+        {% for r in rows %}
+          <tr>
+            <td class="nowrap">{{ to_kst(r.at) }}</td>
+            <td class="truncate">{{ r.user.user_id if r.user else "-" }}</td>
+            <td class="truncate">{{ r.action }}</td>
+            <td class="truncate">{{ r.object_type }}:{{ r.object_key }}</td>
+            <td class="muted truncate">{{ r.source_ip or "-" }}</td>
+            <td class="muted truncate">{% if r.after %}{{ r.after }}{% else %}-{% endif %}</td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

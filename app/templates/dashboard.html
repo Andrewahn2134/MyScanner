@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Dashboard</h2>
+
+  <form method="get" action="/" style="margin:10px 0 0 0">
+    <div class="row">
+      <div>
+        <label>Firewall filter</label>
+        <select name="fw">
+          <option value="" {% if fw=="" %}selected{% endif %}>All</option>
+          <option value="N" {% if fw=="N" %}selected{% endif %}>N</option>
+          <option value="Y" {% if fw=="Y" %}selected{% endif %}>Y</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end"><button type="submit">Apply</button></div>
+    </div>
+  </form>
+
+  <div class="row">
+    <div>
+      <div class="muted">Total Ports (Opened)</div>
+      <div style="font-size:28px;font-weight:800">{{ metrics.total_opened }}</div>
+    </div>
+    <div>
+      <div class="muted">Open Ports (latest)</div>
+      <div style="font-size:28px;font-weight:800">{{ metrics.open_latest }}</div>
+    </div>
+    <div>
+      <div class="muted">Triage queue</div>
+      <div style="font-size:28px;font-weight:800">{{ metrics.triage }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Recent Scan Runs</h3>
+  <table style="table-layout:fixed;width:100%">
+    <thead>
+      <tr>
+        <th style="width:16%" class="nowrap">Date (KST)</th>
+        <th style="width:14%">Scan Name</th>
+        <th style="width:16%">XML ID</th>
+        <th style="width:10%">Status</th>
+        <th style="width:6%">FW</th>
+        <th style="width:16%">Targets</th>
+        <th style="width:14%">Ports</th>
+        <th style="width:4%">View</th>
+        <th style="width:4%">Del</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in runs %}
+        <tr>
+          <td class="nowrap">{{ to_kst(r.started_at) }}</td>
+          <td class="muted truncate">{{ r.scan_name or '-' }}</td>
+          <td class="truncate"><code>{{ r.xml_id }}</code></td>
+          <td>{{ r.status }}</td>
+          <td>{{ r.firewall_blocked }}</td>
+          <td class="muted truncate">{{ r.target_spec }}</td>
+          <td class="muted truncate">{{ r.ports_spec }}</td>
+          <td><a href="/scan/{{ r.id }}">View</a></td>
+          <td>
+            {% if user and user.role=="admin" and r.status!="DONE" %}
+              <form method="post" action="/scan/{{ r.id }}/delete" onsubmit="return confirm('Delete this failed scan run?')">
+                <button type="submit">X</button>
+              </form>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      {% if runs|length == 0 %}
+        <tr><td colspan="9" class="muted">No runs</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

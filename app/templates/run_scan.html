@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Run Scan (admin)</h2>
+  {% if error %}<p class="danger">{{ error }}</p>{% endif %}
+
+  <form method="post" action="/run-scan">
+    <label>Scan name</label>
+    <input name="scan_name" placeholder="예: x월 정기 스캔">
+
+    <div style="margin-top:10px"></div>
+    <label>Targets</label>
+    <input name="targets" placeholder="192.168.0.1/24, 192.168.0.1-50, 192.168.0.1" required>
+
+    <div class="row" style="margin-top:10px">
+      <div>
+        <label>Scan type</label>
+        <select name="scan_type">
+          <option value="tcp" selected>TCP</option>
+          <option value="udp">UDP</option>
+        </select>
+      </div>
+      <div>
+        <label>Top ports</label>
+        <select name="top_ports">
+          <option value="">(none)</option>
+          <option value="100">100</option>
+          <option value="1000">1000</option>
+          <option value="10000">10000</option>
+        </select>
+      </div>
+      <div>
+        <label>Ports</label>
+        <input name="ports" placeholder="1-65535 (or leave blank if using top-ports)">
+      </div>
+      <div>
+        <label>Firewall blocked</label>
+        <select name="fw"><option value="N">N</option><option value="Y">Y</option></select>
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <label>Extra args (allowed: --max-retries, --host-timeout, --min-rate)</label>
+      <input name="extra" placeholder="--max-retries 2 --host-timeout 30s --min-rate 1000">
+      <p class="muted" style="margin-top:6px">
+        Defaults: TCP uses <code>-Pn -T4 -vv</code>, UDP uses <code>-Pn -sU -vv</code>.
+      </p>
+    </div>
+
+    <div style="margin-top:12px"><button type="submit">Start</button></div>
+  </form>
+</div>
+
+{% if run %}
+<div class="card">
+  <h3>Running</h3>
+  <p><span class="pill">Scan</span> {{ run.scan_name or '-' }} &nbsp; <span class="pill">Firewall blocked</span> {{ run.firewall_blocked }} &nbsp;
+     <span class="pill">XML ID</span> <code>{{ run.xml_id }}</code> <a class="right" href="/scan/{{ run.id }}">View</a></p>
+  <button onclick="stopScan('{{ run.xml_id }}')">Stop</button>
+  <h4 style="margin-top:12px">Live log</h4>
+  <pre id="log" style="white-space:pre-wrap;background:#0b1020;border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,.08);max-height:260px;overflow:auto"></pre>
+</div>
+
+<script>
+  const logEl = document.getElementById("log");
+  const src = new EventSource("/scan/" + "{{ run.xml_id }}" + "/stream");
+  src.onmessage = (ev) => {
+    const s = (ev.data || "");
+    logEl.textContent = s.replace(/\\n/g, "\n").replace(/\\t/g, "\t");
+  };
+  async function stopScan(xmlId){
+    await fetch("/scan/" + xmlId + "/stop", {method:"POST"});
+    window.location.href="/";
+  }
+</script>
+{% endif %}
+{% endblock %}

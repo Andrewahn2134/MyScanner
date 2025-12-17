@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Users (admin)</h2>
+  {% if msg %}<p class="ok">{{ msg }}</p>{% endif %}
+  {% if error %}<p class="danger">{{ error }}</p>{% endif %}
+
+  <table>
+    <thead>
+      <tr>
+        <th>UserId</th>
+        <th>Role</th>
+        <th>Email</th>
+        <th>MFA</th>
+        <th>PW Change</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+        <tr>
+          <td>{{ u.user_id }}</td>
+          <td>{{ u.role }}</td>
+          <td class="muted">{{ u.email }}</td>
+          <td>{{ "Y" if u.mfa_enabled else "N" }}</td>
+          <td>{{ "Y" if u.must_change_password else "N" }}</td>
+          <td>
+            <form method="post" action="/users/{{ u.id }}/action" style="display:flex;gap:8px;align-items:center;justify-content:flex-start" onsubmit="return confirmUserAction(this)">
+              <select name="action">
+                <option value="reset_pw">Reset PW</option>
+                <option value="reset_mfa">Reset MFA</option>
+                <option value="force_logout">Force logout</option>
+                <option value="delete_user">Delete user</option>
+              </select>
+              <button type="submit">Apply</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function confirmUserAction(form){
+    try {
+      const act = form.querySelector('select[name="action"]').value;
+      if (act === 'delete_user') {
+        return confirm('Delete this user? This will remove the account and revoke sessions. This cannot be undone.');
+      }
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
+</script>
+{% endblock %}

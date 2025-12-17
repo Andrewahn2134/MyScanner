@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Triage Queue</h2>
+  <p class="muted">Open Port를 리뷰합니다. 리뷰되지 않음(Active),  remediated/ignored/inactive 상태가 되기전까지 근거가 명확하지않은 경우 관리자가 거부(DENIED) 할수있습니다.</p>
+
+  <form method="get" action="/triage">
+  <div class="row">
+    <div>
+      <label>Firewall</label>
+      <select name="fw">
+        <option value="" {% if fw=="" %}selected{% endif %}>All</option>
+        <option value="Y" {% if fw=="Y" %}selected{% endif %}>Y</option>
+        <option value="N" {% if fw=="N" %}selected{% endif %}>N</option>
+      </select>
+    </div>
+    <div>
+      <label>Status</label>
+      <select name="status">
+        <option value="" {% if status=="" %}selected{% endif %}>All</option>
+        <option value="ACTIVE" {% if status=="ACTIVE" %}selected{% endif %}>ACTIVE</option>
+        <option value="DENIED" {% if status=="DENIED" %}selected{% endif %}>DENIED</option>
+      </select>
+    </div>
+    <div>
+      <label>IP</label>
+      <input name="ip" value="{{ ip }}" placeholder="exact match" />
+    </div>
+    <div>
+      <label>Port</label>
+      <input name="port" value="{{ port }}" placeholder="exact match" />
+    </div>
+    <div>
+      <label>Owner</label>
+      <input name="owner" value="{{ owner }}" placeholder="exact match (case-insensitive)" />
+    </div>
+    <div>
+      <label>Operator</label>
+      <input name="operator" value="{{ operator }}" placeholder="exact match (case-insensitive)" />
+    </div>
+    <div>
+      <label>Comment</label>
+      <input name="comment" value="{{ comment }}" placeholder="contains..." />
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:8px">
+      <button type="submit">Filter</button>
+      <a class="btn secondary" href="/export/triage?fw={{ fw }}&status={{ status }}&ip={{ ip }}&port={{ port }}&owner={{ owner }}&operator={{ operator }}&comment={{ comment }}">Export</a>
+      </div>
+  </div>
+</form>
+</div>
+
+<div class="card">
+  <h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+  <span>Queue: {{ rows|length }}</span>
+  <span style="display:flex;gap:8px;flex-wrap:wrap;">
+    <span class="badge">ACTIVE: {{ active_cnt }}</span>
+    <span class="badge">DENIED: {{ denied_cnt }}</span>
+  </span>
+</h3>
+
+  <table style="table-layout:fixed;width:100%">
+    <thead>
+      <tr>
+        <th style="width:18%" class="nowrap">Latest Date (KST)</th>
+        <th style="width:16%">IP</th>
+        <th style="width:8%">Port</th>
+        <th style="width:10%">Service</th>
+        <th style="width:6%">FW</th>
+        <th style="width:14%">Hostname</th>
+        <th style="width:18%">Comment</th>
+        <th style="width:8%">Status</th>
+        <th style="width:8%">Review</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% if rows|length == 0 %}
+        <tr><td colspan="9" class="muted">No rows</td></tr>
+      {% else %}
+        {% for r in rows %}
+          <tr>
+            <td class="nowrap">{{ to_kst(r.latest_seen_at) }}</td>
+            <td>{{ r.ip }}</td>
+            <td>{{ r.port }}</td>
+            <td class="muted truncate">{{ r.service_latest or "-" }}</td>
+            <td>{{ r.firewall_blocked }}</td>
+            <td class="truncate">{{ r.hostname or "-" }}</td>
+            <td class="muted truncate">{% if r.comment %}{{ r.comment }}{% else %}-{% endif %}</td>
+            <td>{{ r.status }}</td>
+            <td><a href="/port/{{ r.id }}?back=/triage">Review</a></td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

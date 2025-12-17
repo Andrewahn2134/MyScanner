@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="card">
+  <h2>Remediated / Inactive</h2>
+
+  <form method="get" action="/remediated" style="margin:10px 0 0 0">
+    <div class="row">
+      <div>
+        <label>Firewall</label>
+        <select name="fw">
+          <option value="" {% if fw=="" %}selected{% endif %}>All</option>
+          <option value="N" {% if fw=="N" %}selected{% endif %}>N</option>
+          <option value="Y" {% if fw=="Y" %}selected{% endif %}>Y</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Status</label>
+        <select name="status">
+          <option value="" {% if status=="" %}selected{% endif %}>All</option>
+          <option value="REMEDIATED" {% if status=="REMEDIATED" %}selected{% endif %}>REMEDIATED</option>
+          <option value="IGNORED" {% if status=="IGNORED" %}selected{% endif %}>IGNORED</option>
+          <option value="INACTIVE" {% if status=="INACTIVE" %}selected{% endif %}>INACTIVE</option>
+        </select>
+      </div>
+
+      <div>
+        <label>IP</label>
+        <input name="ip" value="{{ ip }}" placeholder="exact match" />
+      </div>
+
+      <div>
+        <label>Port</label>
+        <input name="port" value="{{ port }}" placeholder="exact match" />
+      </div>
+
+      <div style="display:flex;align-items:flex-end;justify-content:flex-end;gap:10px;grid-column:1/-1">
+        <button type="submit">Filter</button>
+        <a class="btn" href="/export/remediated?fw={{ fw }}&status={{ status }}&ip={{ ip }}&port={{ port }}">Export</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="muted" style="margin-bottom:8px">Rows: {{ rows|length }}</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:16%">IP</th>
+          <th style="width:8%">Port</th>
+          <th style="width:6%">FW</th>
+          <th style="width:12%">Status</th>
+          <th style="width:18%">Latest Seen (KST)</th>
+          <th style="width:14%">Hostname</th>
+          <th style="width:18%">Ticket</th>
+          <th style="width:8%">Review</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td>{{ r.ip }}</td>
+            <td>{{ r.port }}</td>
+            <td>{{ r.firewall_blocked }}</td>
+            <td>{% if r.inactive %}INACTIVE{% else %}{{ r.status }}{% endif %}</td>
+            <td class="nowrap">{{ to_kst(r.latest_seen_at) }}</td>
+            <td class="truncate">{{ r.hostname or "-" }}</td>
+            <td class="truncate">{{ r.ticket or "-" }}</td>
+            <td><a href="/port/{{ r.id }}?back=/remediated">Review</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

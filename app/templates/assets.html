@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Assets</h2>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px">
+    <p style="margin:0"><span class="pill">Total assets</span> {{ assets|length }}</p>
+    <a class="btn" href="/export/assets">Export</a>
+  </div>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:22%">IP</th>
+        <th style="width:22%">Hostname</th>
+        <th style="width:18%">Operator</th>
+        <th style="width:18%">Owner</th>
+        <th style="width:20%" class="nowrap">Last Seen (KST)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if assets|length == 0 %}
+        <tr><td colspan="5" class="muted">No assets</td></tr>
+      {% else %}
+        {% for ip, last_seen_at, host, operator, owner in assets %}
+          <tr>
+            <td>{{ ip }}</td>
+            <td class="truncate">{{ host or "-" }}</td>
+            <td class="truncate">{{ operator or "-" }}</td>
+            <td class="truncate">{{ owner or "-" }}</td>
+            <td class="muted nowrap">{{ to_kst(last_seen_at) }}</td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

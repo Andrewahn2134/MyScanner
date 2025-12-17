@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>MFA 등록 (최초 로그인)</h2>
+  <p class="muted">등록 완료 후 서비스 접근이 가능.</p>
+  {% if error %}<p class="danger">{{ error }}</p>{% endif %}
+  <p><span class="pill">User</span> {{ user.user_id }}</p>
+  <img src="data:image/png;base64,{{ qr_png_base64 }}" alt="MFA QR Code" style="max-width:240px; background:white; padding:8px; border-radius:12px;">
+  <p class="muted">Secret: <code>{{ secret }}</code></p>
+  <form method="post" action="/mfa/enroll">
+    <label>6자리 코드</label>
+    <input name="code" required>
+    <div style="margin-top:12px"><button type="submit">Verify & enable</button></div>
+  </form>
+</div>
+{% endblock %}
