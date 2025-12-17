@@ -70,7 +70,7 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
   - admin: 스캔 실행/중지/삭제/ingest, 사용자 관리, 감사로그 접근
   - operator: 조회 및 제한된 운영(설정에 따라 조정 가능)
 - 비밀번호 정책(회원가입): **8자 이상 + 대문자/소문자/숫자/특수문자 각각 1개 이상**
-- MFA(TOTP): 첫 로그인 시 등록 강제 → 이후 로그인 시 항상 코드 요구
+- MFA(TOTP): google authenticator app 지원,첫 로그인 시 등록 강제 → 이후 로그인 시 항상 코드 요구
 - Reset PW: 정책을 만족하는 **랜덤 임시 비밀번호 발급** + `must_change_password=True`
 - 임시 비밀번호로 로그인 시 **강제 비밀번호 변경 페이지(/change_password)** 로만 접근 가능
 - Reset MFA / Force Logout / Delete user: Users(admin) 메뉴에서 관리
