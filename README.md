@@ -21,7 +21,7 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 <img width="1185" height="401" alt="image" src="https://github.com/user-attachments/assets/a83732e9-3d61-4efe-8340-89c2f54f2fd2" />
 
 ### Scan Run
-- 대상/포트 범위/옵션으로 Nmap 실행
+- 대상/포트 범위/옵션으로 Nmap 실행(스캔허용 ip는 docker-compose.yml 내 ALLOWED_TARGETS 참고)
 - 방화벽 차단/허용 상태를 통해 스캔 진행 시 방화벽을 허용절차를 거치고 수행했는지(내부망 스캔),- 방화벽 차단을 유지한 상태로 스캔(공격자 관점 스캔)으로 진행하였는지 표기 가능
 - 실행 로그 tail/stream 확인
 - **스캔 종료 시 `Ingest` 버튼 클릭으로 XML을 Inventory에 반영**
