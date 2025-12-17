@@ -67,6 +67,15 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 - 임시 비밀번호로 로그인 시 **강제 비밀번호 변경 페이지(/change_password)** 로만 접근 가능
 - Reset MFA / Force Logout / Delete user: Users(admin) 메뉴에서 관리
 
+#### admin 화면
+<img width="1418" height="713" alt="image" src="https://github.com/user-attachments/assets/23055a48-98ec-4304-9d2b-02ecc90df15c" />
+
+#### operator 화면
+<img width="1358" height="717" alt="image" src="https://github.com/user-attachments/assets/dece27db-e19e-4860-bf8a-291457c12c19" />
+
+### Users
+<img width="1417" height="387" alt="image" src="https://github.com/user-attachments/assets/bbf756a2-d71b-475a-a885-3d11286bdcc8" />
+
 ---
 
 ## 실행 방법 (Linux 서버 권장)
