@@ -1,8 +1,10 @@
 # MyScanner (포트 스캔·인벤토리·Triage/Remediation 관리)
 
 MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포트 노출에 대한 **Triage(검토/소명) → Remediation(조치/예외)** 흐름을 웹 UI로 관리하는 솔루션입니다.
+
 해당 솔루션은 정기적인 포트스캔을 내/외부자 관점으로 진행할 때, 이력과 포트에 대한 조치사항을 관리할 수 있는 솔루션입니다
-주 이용자는 취약점 담당 인원과 방화벽을 담당하는 인원이 될 것 으로 보입니다.
+
+- 주 이용자 : 취약점 담당 인력 & IT 방화벽을 담당하는 인력
 
 - Backend: FastAPI + SQLAlchemy + PostgreSQL
 - Frontend: Jinja2 템플릿(서버사이드 렌더링)
