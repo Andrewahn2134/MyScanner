@@ -14,6 +14,7 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 ### Dashboard
 - 최근 스캔/인벤토리 요약
 - Scan Run 목록(실행 로그 확인, Ingest, 삭제)
+<img width="1185" height="401" alt="image" src="https://github.com/user-attachments/assets/a83732e9-3d61-4efe-8340-89c2f54f2fd2" />
 
 ### Scan Run
 - 대상/포트 범위/옵션으로 Nmap 실행
@@ -21,10 +22,19 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 - **스캔 종료 시 `Ingest` 버튼 클릭으로 XML을 Inventory에 반영**
 - Ingest 성공(SUCCESS) 후 **스캔 아티팩트(xml/log)를 자동 삭제**(로그 무한 누적 방지)
 
-### Inventory / Results
+#### 스캔 실행시
+<img width="1163" height="831" alt="image" src="https://github.com/user-attachments/assets/aee5f984-bf11-431a-891f-7947f82e6065" />
+
+#### View Option(스캔완료)
+<img width="1170" height="953" alt="image" src="https://github.com/user-attachments/assets/2fb176cb-891d-4b54-95b1-bb40afaec137" />
+
+
+###  Results
 - IP/Port 기준 포트 인벤토리 관리
 - FW 프로필(Y/N) 포함 데이터가 존재하더라도 **(IP,Port)는 동일 단위로 상태/미탐 카운트를 동기화**(중복/불일치 방지)
 - Excel Export 지원
+<img width="1184" height="812" alt="image" src="https://github.com/user-attachments/assets/8f60573b-d0ff-440e-8b8b-21aca6fbefc4" />
+
 
 ### Triage Queue / Remediated
 - 상태(Status)와 Reviewed에 따라 화면이 자동 분리됩니다.
@@ -35,7 +45,13 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 - **INACTIVE(미탐 2회) 상태**가 되면 휴먼에러 방지를 위해 **Status/Reviewed 수정이 금지**됩니다.
   - 이후 스캔에서 다시 탐지(open)되면 INACTIVE 해제 + Reviewed 초기화로 Triage로 복귀
 
-### Audit
+<img width="1178" height="662" alt="image" src="https://github.com/user-attachments/assets/5b6a837e-4cbd-47db-a903-8e8fd0f6f164" />
+
+### Asset
+- 스캔시, open된 포트를 보유한이력이 있는 IP를 목록으로 관리하는 기능입니다.
+<img width="1171" height="395" alt="image" src="https://github.com/user-attachments/assets/e08e6c65-9b10-488c-b515-639bfedad612" />
+
+### Audit(관리자 접근가능)
 - 주요 작업(스캔/반영/계정관리/상태변경 등) 감사 로그
 - 날짜 필터는 **KST(Asia/Seoul) 기준**으로 동작하도록 UTC 저장 시간을 변환해 조회
 
@@ -106,22 +122,25 @@ services:
       POSTGRES_PASSWORD: myscanner
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myscanner -d myscanner"]
       interval: 3s
       timeout: 3s
       retries: 30
 
-  app:
+  web:
     build: .
     environment:
       DATABASE_URL: postgresql+psycopg2://myscanner:myscanner@db:5432/myscanner
-      LOG_DIR: /var/MyScanner/log
+      SESSION_SECRET: "change-me-in-prod"
+      LOG_DIR: "/var/MyScanner/log"
       ALLOWED_TARGETS: "192.168.0.0/16,10.0.0.0/8"
-      DEFAULT_TCP_ARGS: "-sT -sV -Pn -T3 -vv"
+      DEFAULT_NMAP_ARGS: "-sT -sV -Pn -T3 -vv"
       TZ: "Asia/Seoul"
     volumes:
-      - ./data/log:/var/MyScanner/log
+      - /var/MyScanner/log:/var/MyScanner/log
     depends_on:
       db:
         condition: service_healthy
@@ -130,6 +149,7 @@ services:
 
 volumes:
   pgdata:
+
 ```
 
 ---
