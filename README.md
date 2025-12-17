@@ -18,6 +18,7 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 
 ### Scan Run
 - 대상/포트 범위/옵션으로 Nmap 실행
+- 방화벽 차단/허용 상태를 통해 해당 스캔 진행 시 방화벽을 허용절차를 거치고 수행했는지(내부망 스캔), 방화벽 차단을 유지한 상태로 스캔(공격자 관점의 스캔)으로 진행하였는지 표기 할수있습니다.
 - 실행 로그 tail/stream 확인
 - **스캔 종료 시 `Ingest` 버튼 클릭으로 XML을 Inventory에 반영**
 - Ingest 성공(SUCCESS) 후 **스캔 아티팩트(xml/log)를 자동 삭제**(로그 무한 누적 방지)
@@ -37,7 +38,10 @@ MyScanner는 **Nmap 스캔 결과(XML)** 를 인벤토리에 반영하고, 포�
 
 
 ### Triage Queue / Remediated
-- 상태(Status)와 Reviewed에 따라 화면이 자동 분리됩니다.
+- 상태(Status)와 Reviewed에 따라 데이터가 Triage Queue와 Remediated 메뉴로 자동 분리됩니다.
+- **중복입력 방지 정책**
+  - FW(방화벽)플래그가 다른 동일 IP/PORT의 경우 데이터가 중첩되어 생길 수 있습니다.(IP/PORT 당 최대 2개 데이터)
+  - 동일한 IP/PORT에 대한 내용의 중복적인 기입을 방지하기 위해 이미 동일한 IP/PORT로 기입된 정보가 있으면, 새로 생기는 데이터 또한 동일한 내용이 입력되도록 설계하였습니다.
 - **휴먼에러 방지 정책**
   - `REMEDIATED` / `IGNORED`로 바꾸면 **Reviewed가 자동으로 Y 처리**되어 실수로 Reviewed를 안 올려도 “사라짐”이 발생하지 않도록 설계
   - `DENIED`는 Triage Queue에 유지(추가 검토 대상)하며 Reviewed는 강제로 N
