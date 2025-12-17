@@ -276,7 +276,7 @@ def signup(req: Request, db: Session = Depends(get_db),
 @app.get("/login", response_class=HTMLResponse)
 def login_form(req: Request, msg: str | None = None, db: Session = Depends(get_db)):
     inject_ctx(req, db)
-    friendly = "가입 완료! 로그인하면 최초 1회 MFA 등록을 진행해." if msg == "signup_ok" else None
+    friendly = "가입 성공! 로그인하면 최초 1회 MFA 등록을 진행하세요." if msg == "signup_ok" else None
     return templates.TemplateResponse("login.html", {"request": req, "error": None, "msg": friendly})
 
 @app.post("/login", response_class=HTMLResponse)
